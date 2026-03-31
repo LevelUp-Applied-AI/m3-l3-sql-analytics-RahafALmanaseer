@@ -164,3 +164,28 @@ SELECT e.email,
 FROM employees e
 JOIN employee_certifications ec ON e.employee_id = ec.employee_id
 JOIN certifications c ON ec.certification_id = c.certification_id;
+
+
+-- Tier 1 — Complex Analytics Queries
+SELECT
+    p.name AS project_name,
+    p.budget AS total_budget_hours,
+    SUM(pa.hours_allocated) AS total_allocated_hours,
+    -- Calculation for the percentage used
+    ROUND((SUM(pa.hours_allocated) / p.budget) * 100, 2) AS usage_percentage
+FROM projects p
+JOIN project_assignments pa ON p.project_id = pa.project_id
+GROUP BY p.project_id, p.name, p.budget
+-- The Filter: Compare total hours to 80% of budget
+HAVING SUM(pa.hours_allocated) > (p.budget * 0.8);
+
+SELECT
+    e.first_name,
+    e.last_name,
+    e.department_id AS employee_dept_id,
+    p.name AS project_name,
+    p.department_id AS project_dept_id
+FROM employees e
+JOIN project_assignments pa ON e.employee_id = pa.employee_id
+JOIN projects p ON pa.project_id = p.project_id
+WHERE e.department_id != p.department_id;
